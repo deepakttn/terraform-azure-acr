@@ -25,19 +25,8 @@ module "acr" {
   # source = "git::https://github.com/tothenew/terraform-azure-acr.git"
   source = "../.."
 
-  # registry_name              = "${local.name_prefix}cr"
+  registry_name              = "${local.name_prefix}cr"
   location                   = azurerm_resource_group.rg.location
   resource_group_name        = azurerm_resource_group.rg.name
   log_analytics_workspace_id = module.log_analytics.workspace_id
-
-  container_registry_config = {
-    name = "${local.name_prefix}cr"
-  }
-
-  blob_backend_config = {
-    rg_name              = azurerm_resource_group.rg.name
-    storage_account_name = "saname"
-    container_name       = "cname"
-    key                  = "key.backend"
-  }
 }
