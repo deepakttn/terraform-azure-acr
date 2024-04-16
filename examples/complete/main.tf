@@ -21,8 +21,26 @@ module "log_analytics" {
   location            = azurerm_resource_group.rg.location
 }
 
+module "vnet" {
+  source              = "git::https://github.com/tothenew/terraform-azure-vnet.git"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  address_space       = "10.41.0.0/20"
+
+  virtual_network_peering = false
+
+  subnets = {
+    "aks_subnet" = {
+      address_prefixes           = ["10.41.1.0/24"]
+      associate_with_route_table = false
+      is_natgateway              = false
+      is_nsg                     = true
+      service_delegation         = false
+    }
+  }
+}
+
 module "acr" {
-  # source = "git::https://github.com/tothenew/terraform-azure-acr.git"
   source = "../.."
 
   registry_name              = "${local.name_prefix}cr"
@@ -31,8 +49,9 @@ module "acr" {
   log_analytics_workspace_id = module.log_analytics.workspace_id
   admin_enabled              = false
   sku                        = "Premium"
-
-  # If one or more georeplications block is specified, they are expected to follow the alphabetic order on the location property.
+  subnet_id                  = module.vnet.subnet_ids["aks_subnet"] 
+  images_retention_enabled   = false
+  trust_policy_enabled       = false 
   georeplications = [
     {
       location                = "Norway East"
@@ -45,17 +64,12 @@ module "acr" {
   ]
 
   webhooks = {
-    "webapp" = {
-      name        = "webappwebhook"
-      service_uri = "https://webappwebhookreceiver.example/webapptag"
-      actions     = ["push"]
-      status      = "enabled"
-      scope       = "webapptag:*"
-    }
-    # "sql" = {
-    #   name        = "sqlwebhook"
-    #   service_uri = "https://sqlwebhookreceiver.example"
+    # "webapp" = {
+    #   name        = "webappwebhook"
+    #   service_uri = "https://webappwebhookreceiver.example/webapptag"
     #   actions     = ["push"]
+    #   status      = "enabled"
+    #   scope       = "webapptag:*"
     # }
   }
 }

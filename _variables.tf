@@ -19,7 +19,7 @@ variable "resource_group_name" {
 variable "sku" {
   description = "The SKU tier for the Container Registry."
   type        = string
-  default     = "Basic"
+  default     = "Standard"
 }
 
 variable "admin_enabled" {
@@ -39,6 +39,41 @@ variable "georeplications" {
   default = []
 }
 
+variable "images_retention_enabled" {
+  description = "Specifies whether images retention is enabled (Premium only)."
+  type        = bool
+  default     = false
+}
+
+variable "images_retention_days" {
+  description = "Specifies the number of images retention days."
+  type        = number
+  default     = 90
+}
+
+variable "azure_services_bypass_allowed" {
+  description = "Whether to allow trusted Azure services to access a network restricted Container Registry."
+  type        = bool
+  default     = false
+}
+
+variable "trust_policy_enabled" {
+  description = "Specifies whether the trust policy is enabled (Premium only)."
+  type        = bool
+  default     = false 
+}
+
+variable "public_network_access_enabled" {
+  description = "Whether the Container Registry is accessible publicly."
+  type        = bool
+  default     = true
+}
+
+variable "data_endpoint_enabled" {
+  description = "Whether to enable dedicated data endpoints for this Container Registry? (Only supported on resources with the Premium SKU)."
+  default     = false
+  type        = bool
+}
 variable "webhooks" {
   description = "A map of webhooks to create for this Container Registry."
 
@@ -83,7 +118,7 @@ variable "diagnostic_setting_name" {
 variable "name" {
   type        = string
   description = "A string value to describe prefix of all the resources"
-  default     = ""
+  default     = "Dev-SpecialChem"
 }
 
 variable "default_tags" {
@@ -91,7 +126,7 @@ variable "default_tags" {
   description = "A map to add common tags to all the resources"
   default = {
     "Scope" : "ACR"
-    "CreatedBy" : "Terraform"
+    "CreatedBy" : "TTN"
   }
 }
 
@@ -99,4 +134,8 @@ variable "common_tags" {
   type        = map(string)
   description = "A map to add common tags to all the resources"
   default     = {}
+}
+
+variable "subnet_id" {
+  type = string
 }

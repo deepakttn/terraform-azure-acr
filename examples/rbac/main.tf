@@ -22,13 +22,17 @@ module "log_analytics" {
 }
 
 module "acr" {
-  # source = "git::https://github.com/tothenew/terraform-azure-acr.git"
   source = "../.."
 
   registry_name              = "${local.name_prefix}cr"
   location                   = azurerm_resource_group.rg.location
   resource_group_name        = azurerm_resource_group.rg.name
   log_analytics_workspace_id = module.log_analytics.workspace_id
+  admin_enabled              = false
+  sku                        = "Premium"
+  subnet_id                  = module.vnet.subnet_ids["aks_subnet"] 
+  images_retention_enabled   = false
+  trust_policy_enabled       = false 
 }
 
 resource "azurerm_user_assigned_identity" "ua-identity" {
